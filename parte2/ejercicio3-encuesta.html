@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio 3 - Encuesta</title>
+    <link rel="stylesheet" href="ejercicio3-encuesta.css">
+</head>
+<body>
+    <main class="page">
+        <section class="card">
+            <header>
+                <span class="tag">EJERCICIO 3</span>
+                <h1>Encuesta</h1>
+                <p>Queremos conocer tu opinión.</p>
+            </header>
+
+            <form action="#" method="post" class="form">
+                <fieldset>
+                    <legend>¿Cómo fue tu experiencia?</legend>
+                    <label class="choice"><input type="radio" name="calificacion" value="excelente" required> Excelente</label>
+                    <label class="choice"><input type="radio" name="calificacion" value="buena"> Buena</label>
+                    <label class="choice"><input type="radio" name="calificacion" value="regular"> Regular</label>
+                    <label class="choice"><input type="radio" name="calificacion" value="mala"> Mala</label>
+                </fieldset>
+
+                <fieldset>
+                    <legend>¿Qué te gustó?</legend>
+                    <label class="choice"><input type="checkbox" name="aspectos" value="diseno"> Diseño</label>
+                    <label class="choice"><input type="checkbox" name="aspectos" value="rapidez"> Rapidez</label>
+                    <label class="choice"><input type="checkbox" name="aspectos" value="facilidad"> Facilidad de uso</label>
+                </fieldset>
+
+                <div class="field">
+                    <label for="nivel">¿Recomendarías el servicio?</label>
+                    <input id="nivel" name="nivel" type="range" min="1" max="10" value="7">
+                    <div class="scale"><span>1</span><span>10</span></div>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="button primary">Enviar encuesta</button>
+                    <button type="reset" class="button secondary">Limpiar</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
