@@ -1,0 +1,28 @@
+<section class="testimonials" id="opiniones">
+  <div class="section-heading">
+    <span class="section-label">EXPERIENCIAS REALES</span>
+    <h2>Lo que dicen nuestros clientes</h2>
+    <p>La confianza también hace parte de una buena experiencia tecnológica.</p>
+  </div>
+
+  <div class="testimonials-grid">
+    @for (testimonial of testimonials; track testimonial.name) {
+      <article class="testimonial-card">
+        <div class="stars">★★★★★</div>
+
+        <p class="comment">"{{ testimonial.comment }}"</p>
+
+        <div class="client-info">
+          <div class="client-avatar">
+            {{ testimonial.name.charAt(0) }}
+          </div>
+
+          <div>
+            <h3>{{ testimonial.name }}</h3>
+            <span>{{ testimonial.role }}</span>
+          </div>
+        </div>
+      </article>
+    }
+  </div>
+</section>

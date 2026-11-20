@@ -1,0 +1,27 @@
+<section class="services" id="catalogo">
+  <div class="section-heading">
+    <span class="section-label">LO QUE OFRECEMOS</span>
+    <h2>Nuestro catálogo</h2>
+    <p>Todo lo que necesitas para mejorar tu espacio tecnológico.</p>
+  </div>
+
+  <div class="services-grid">
+    @for (service of services; track service.title) {
+      <article class="service-card">
+        <h3>{{ service.title }}</h3>
+        <p>{{ service.description }}</p>
+
+        <div class="tags">
+          @for (tag of service.tags; track tag) {
+            <span class="tag">{{ tag }}</span>
+          }
+        </div>
+
+        <div class="service-actions">
+          <a href="#contacto">Consultar</a>
+          <a href="#contacto">Más información</a>
+        </div>
+      </article>
+    }
+  </div>
+</section>

@@ -1,0 +1,35 @@
+
+<section class="standards" id="por-que-elegirnos">
+  <div class="container">
+
+    <div class="section-heading">
+      <span class="section-label">POR QUÉ ELEGIRNOS</span>
+
+      <h2>Compra tranquilo y sin que te metan gato por liebre.</h2>
+
+      <p>
+        En ALETECH queremos que encuentres tecnología de calidad,
+        con asesoría y respaldo en cada compra.
+      </p>
+    </div>
+
+    <div class="standards-grid">
+
+      @for (item of standards; track item.number) {
+        <article class="standard-card">
+
+          <span class="card-number">{{ item.number }}</span>
+
+          <h3>{{ item.title }}</h3>
+
+          <p>{{ item.description }}</p>
+
+          <div class="card-line"></div>
+
+        </article>
+      }
+
+    </div>
+
+  </div>
+</section>

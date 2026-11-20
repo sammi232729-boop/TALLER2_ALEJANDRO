@@ -1,0 +1,74 @@
+
+.about {
+  padding: 100px 8%;
+  background-color: #171717;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 65px;
+  align-items: center;
+}
+
+.section-label {
+  color: #d4d4d4;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.about-content h2 {
+  color: #f5f5f5;
+  font-size: 2.5rem;
+  line-height: 1.2;
+  margin: 18px 0 25px;
+}
+
+.about-content p {
+  color: #a3a3a3;
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+
+.about-values {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.value-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 22px;
+  background-color: #0d0d0d;
+  border: 1px solid #383838;
+  border-radius: 14px;
+}
+
+.value-number {
+  color: #d4d4d4;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.value-card h3 {
+  color: #f5f5f5;
+  margin: 0 0 8px;
+}
+
+.value-card p {
+  color: #a3a3a3;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 800px) {
+  .about {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    padding: 70px 6%;
+  }
+
+  .about-content h2 {
+    font-size: 2rem;
+  }
+}
