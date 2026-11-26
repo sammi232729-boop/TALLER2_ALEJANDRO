@@ -1,0 +1,90 @@
+<div class="register-wrapper">
+  <div class="register-container">
+    <p-card styleClass="register-card">
+      <div class="register-header">
+        <div>
+          <span class="badge-tag">Portal Hospitalario · Fase 1</span>
+          <h1>Registro de Nuevo Usuario</h1>
+          <p>Complete todos los campos para habilitar su cuenta e iniciar sesión con su identificación.</p>
+        </div>
+        <a routerLink="/login" pButton label="Volver al Login" icon="pi pi-arrow-left" class="p-button-text"></a>
+      </div>
+
+      <div *ngIf="errorMensaje()" class="alert-box">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ errorMensaje() }}</span>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="form-grid">
+        <div class="field-group">
+          <label for="identificacion">Identificación *</label>
+          <input id="identificacion" type="text" pInputText formControlName="identificacion" placeholder="Número de documento" class="w-full" />
+          <small class="field-error" *ngIf="hasError('identificacion')">Mínimo 3 caracteres.</small>
+        </div>
+
+        <div class="field-group">
+          <label for="cargo">Cargo *</label>
+          <p-dropdown
+            inputId="cargo"
+            formControlName="cargo"
+            [options]="cargos"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccione un cargo"
+            styleClass="w-full"
+          ></p-dropdown>
+          <small class="field-error" *ngIf="hasError('cargo')">Seleccione un cargo.</small>
+        </div>
+
+        <div class="field-group">
+          <label for="nombre">Nombre *</label>
+          <input id="nombre" type="text" pInputText formControlName="nombre" placeholder="Nombres" class="w-full" />
+          <small class="field-error" *ngIf="hasError('nombre')">El nombre es obligatorio.</small>
+        </div>
+
+        <div class="field-group">
+          <label for="apellido">Apellido *</label>
+          <input id="apellido" type="text" pInputText formControlName="apellido" placeholder="Apellidos" class="w-full" />
+          <small class="field-error" *ngIf="hasError('apellido')">El apellido es obligatorio.</small>
+        </div>
+
+        <div class="field-group">
+          <label for="email">Correo Electrónico *</label>
+          <input id="email" type="email" pInputText formControlName="email" placeholder="correo@hospital.edu.co" class="w-full" />
+          <small class="field-error" *ngIf="hasError('email')">Ingrese un email válido.</small>
+        </div>
+
+        <div class="field-group">
+          <label for="telefono">Teléfono *</label>
+          <input id="telefono" type="text" pInputText formControlName="telefono" placeholder="Ej. 3105550199" class="w-full" />
+          <small class="field-error" *ngIf="hasError('telefono')">Mínimo 7 dígitos.</small>
+        </div>
+
+        <div class="field-group">
+          <label for="nombre_usuario">Nombre de usuario *</label>
+          <input id="nombre_usuario" type="text" pInputText formControlName="nombre_usuario" placeholder="Ej. jcuastumal" class="w-full" />
+          <small class="field-error" *ngIf="hasError('nombre_usuario')">Mínimo 3 caracteres.</small>
+        </div>
+
+        <div class="field-group">
+          <label for="contrasena">Contraseña *</label>
+          <p-password
+            inputId="contrasena"
+            formControlName="contrasena"
+            [feedback]="true"
+            [toggleMask]="true"
+            placeholder="Mínimo 6 caracteres"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          ></p-password>
+          <small class="field-error" *ngIf="hasError('contrasena')">Mínimo 6 caracteres.</small>
+        </div>
+
+        <div class="form-actions">
+          <a routerLink="/login" pButton label="Cancelar" class="p-button-outlined p-button-secondary"></a>
+          <p-button type="submit" label="Registrar Usuario" icon="pi pi-check" [loading]="loading()"></p-button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

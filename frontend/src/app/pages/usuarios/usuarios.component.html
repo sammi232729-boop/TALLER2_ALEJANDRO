@@ -1,0 +1,291 @@
+<div class="page-shell">
+  <p-toolbar styleClass="top-navbar">
+    <div class="p-toolbar-group-start brand-cluster">
+      <div class="brand-icon"><i class="pi pi-heart-fill"></i></div>
+      <div>
+        <h2>Portal Hospitalario</h2>
+        <span>Módulo de Gestión de Cuentas de Usuario</span>
+      </div>
+    </div>
+
+    <div class="p-toolbar-group-end session-cluster">
+      <div class="user-pill" *ngIf="currentUser() as active">
+        <i class="pi pi-user"></i>
+        <span>{{ active.nombre }} {{ active.apellido }}</span>
+        <p-tag [value]="active.cargo" [severity]="getCargoSeverity(active.cargo)"></p-tag>
+      </div>
+      <p-button
+        label="Cerrar Sesión"
+        icon="pi pi-sign-out"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="cerrarSesion()"
+      ></p-button>
+    </div>
+  </p-toolbar>
+
+  <main class="dashboard-content">
+    <section class="kpi-grid">
+      <p-card styleClass="kpi-card">
+        <div class="kpi-inner">
+          <div>
+            <span class="kpi-label">Total Cuentas</span>
+            <strong class="kpi-value">{{ totalUsuarios() }}</strong>
+          </div>
+          <div class="kpi-badge kpi-teal"><i class="pi pi-users"></i></div>
+        </div>
+      </p-card>
+
+      <p-card styleClass="kpi-card">
+        <div class="kpi-inner">
+          <div>
+            <span class="kpi-label">Activados</span>
+            <strong class="kpi-value">{{ totalActivos() }}</strong>
+          </div>
+          <div class="kpi-badge kpi-green"><i class="pi pi-check-circle"></i></div>
+        </div>
+      </p-card>
+
+      <p-card styleClass="kpi-card">
+        <div class="kpi-inner">
+          <div>
+            <span class="kpi-label">Desactivados</span>
+            <strong class="kpi-value">{{ totalDesactivados() }}</strong>
+          </div>
+          <div class="kpi-badge kpi-red"><i class="pi pi-ban"></i></div>
+        </div>
+      </p-card>
+
+      <p-card styleClass="kpi-card">
+        <div class="kpi-inner">
+          <div>
+            <span class="kpi-label">Doctores y Especialistas</span>
+            <strong class="kpi-value">{{ totalMedicos() }}</strong>
+          </div>
+          <div class="kpi-badge kpi-blue"><i class="pi pi-briefcase"></i></div>
+        </div>
+      </p-card>
+    </section>
+
+    <p-card styleClass="table-card">
+      <div class="table-toolbar">
+        <div>
+          <h3>Listado de Usuarios Registrados</h3>
+          <p>Administre cuentas, cargos hospitalarios y habilitación de acceso al sistema.</p>
+        </div>
+
+        <div class="table-actions">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              pInputText
+              placeholder="Buscar usuario..."
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            />
+          </span>
+          <p-button
+            label="Actualizar"
+            icon="pi pi-refresh"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="cargarUsuarios()"
+          ></p-button>
+          <p-button
+            label="Nuevo Usuario"
+            icon="pi pi-plus"
+            (onClick)="abrirNuevo()"
+          ></p-button>
+        </div>
+      </div>
+
+      <p-table
+        #dt
+        [value]="usuarios()"
+        [loading]="loading()"
+        [paginator]="true"
+        [rows]="8"
+        [rowsPerPageOptions]="[5, 8, 15, 25]"
+        [globalFilterFields]="['identificacion', 'nombre', 'apellido', 'email', 'cargo', 'nombre_usuario', 'estado']"
+        responsiveLayout="scroll"
+        styleClass="p-datatable-sm p-datatable-striped"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="identificacion">Identificación <p-sortIcon field="identificacion"></p-sortIcon></th>
+            <th pSortableColumn="nombre">Nombre Completo <p-sortIcon field="nombre"></p-sortIcon></th>
+            <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+            <th pSortableColumn="cargo">Cargo <p-sortIcon field="cargo"></p-sortIcon></th>
+            <th>Teléfono</th>
+            <th pSortableColumn="nombre_usuario">Usuario <p-sortIcon field="nombre_usuario"></p-sortIcon></th>
+            <th pSortableColumn="estado">Estado <p-sortIcon field="estado"></p-sortIcon></th>
+            <th style="width: 14rem; text-align: center;">Acciones</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-usuario>
+          <tr>
+            <td><strong>{{ usuario.identificacion }}</strong></td>
+            <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>
+              <p-tag [value]="usuario.cargo" [severity]="getCargoSeverity(usuario.cargo)"></p-tag>
+            </td>
+            <td>{{ usuario.telefono }}</td>
+            <td>{{ usuario.nombre_usuario }}</td>
+            <td>
+              <p-tag
+                [value]="usuario.estado"
+                [severity]="usuario.estado === 'Activado' ? 'success' : 'danger'"
+                [icon]="usuario.estado === 'Activado' ? 'pi pi-check' : 'pi pi-times'"
+              ></p-tag>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <p-button
+                  [icon]="usuario.estado === 'Activado' ? 'pi pi-ban' : 'pi pi-check-circle'"
+                  [severity]="usuario.estado === 'Activado' ? 'warning' : 'success'"
+                  [rounded]="true"
+                  [text]="true"
+                  [pTooltip]="usuario.estado === 'Activado' ? 'Desactivar usuario' : 'Activar usuario'"
+                  tooltipPosition="top"
+                  (onClick)="toggleEstado(usuario)"
+                ></p-button>
+                <p-button
+                  icon="pi pi-pencil"
+                  severity="info"
+                  [rounded]="true"
+                  [text]="true"
+                  pTooltip="Editar usuario"
+                  tooltipPosition="top"
+                  (onClick)="abrirEditar(usuario)"
+                ></p-button>
+                <p-button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  [rounded]="true"
+                  [text]="true"
+                  pTooltip="Eliminar usuario"
+                  tooltipPosition="top"
+                  (onClick)="confirmarEliminar(usuario)"
+                ></p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8" class="empty-state">
+              No se encontraron usuarios registrados.
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </main>
+
+  <p-dialog
+    [header]="editingUserId() === null ? 'Registrar Nuevo Usuario' : 'Editar Usuario'"
+    [visible]="dialogVisible()"
+    (visibleChange)="dialogVisible.set($event)"
+    [modal]="true"
+    [style]="{ width: '640px', maxWidth: '95vw' }"
+    [draggable]="false"
+  >
+    <form [formGroup]="usuarioForm" (ngSubmit)="guardarUsuario()" class="dialog-grid">
+      <div class="field-group">
+        <label for="dlg-identificacion">Identificación *</label>
+        <input id="dlg-identificacion" type="text" pInputText formControlName="identificacion" class="w-full" />
+        <small class="field-error" *ngIf="hasError('identificacion')">Mínimo 3 caracteres.</small>
+      </div>
+
+      <div class="field-group">
+        <label for="dlg-cargo">Cargo *</label>
+        <p-dropdown
+          inputId="dlg-cargo"
+          formControlName="cargo"
+          [options]="cargos"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        ></p-dropdown>
+      </div>
+
+      <div class="field-group">
+        <label for="dlg-nombre">Nombre *</label>
+        <input id="dlg-nombre" type="text" pInputText formControlName="nombre" class="w-full" />
+        <small class="field-error" *ngIf="hasError('nombre')">Campo requerido.</small>
+      </div>
+
+      <div class="field-group">
+        <label for="dlg-apellido">Apellido *</label>
+        <input id="dlg-apellido" type="text" pInputText formControlName="apellido" class="w-full" />
+        <small class="field-error" *ngIf="hasError('apellido')">Campo requerido.</small>
+      </div>
+
+      <div class="field-group">
+        <label for="dlg-email">Email *</label>
+        <input id="dlg-email" type="email" pInputText formControlName="email" class="w-full" />
+        <small class="field-error" *ngIf="hasError('email')">Email inválido.</small>
+      </div>
+
+      <div class="field-group">
+        <label for="dlg-telefono">Teléfono *</label>
+        <input id="dlg-telefono" type="text" pInputText formControlName="telefono" class="w-full" />
+        <small class="field-error" *ngIf="hasError('telefono')">Mínimo 7 dígitos.</small>
+      </div>
+
+      <div class="field-group">
+        <label for="dlg-usuario">Nombre de usuario *</label>
+        <input id="dlg-usuario" type="text" pInputText formControlName="nombre_usuario" class="w-full" />
+        <small class="field-error" *ngIf="hasError('nombre_usuario')">Mínimo 3 caracteres.</small>
+      </div>
+
+      <div class="field-group">
+        <label for="dlg-estado">Estado *</label>
+        <p-dropdown
+          inputId="dlg-estado"
+          formControlName="estado"
+          [options]="estados"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        ></p-dropdown>
+      </div>
+
+      <div class="field-group full-span">
+        <label for="dlg-contrasena">
+          Contraseña {{ editingUserId() === null ? '*' : '(opcional: dejar vacío para conservar la actual)' }}
+        </label>
+        <p-password
+          inputId="dlg-contrasena"
+          formControlName="contrasena"
+          [feedback]="false"
+          [toggleMask]="true"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+        ></p-password>
+        <small class="field-error" *ngIf="hasError('contrasena')">Mínimo 6 caracteres.</small>
+      </div>
+
+      <div class="dialog-footer full-span">
+        <p-button
+          type="button"
+          label="Cancelar"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="dialogVisible.set(false)"
+        ></p-button>
+        <p-button
+          type="submit"
+          [label]="editingUserId() === null ? 'Crear Usuario' : 'Guardar Cambios'"
+          icon="pi pi-save"
+          [loading]="saving()"
+        ></p-button>
+      </div>
+    </form>
+  </p-dialog>
+</div>

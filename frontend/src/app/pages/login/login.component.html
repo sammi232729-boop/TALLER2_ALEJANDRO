@@ -1,0 +1,83 @@
+<div class="auth-wrapper">
+  <div class="auth-panel">
+    <div class="brand-aside">
+      <div class="brand-badge">
+        <i class="pi pi-heart-fill"></i>
+        <span>Sistema Hospitalario</span>
+      </div>
+      <h1>Gestión de Cuentas de Usuario</h1>
+      <p>
+        Plataforma institucional para la administración segura del personal médico,
+        especialistas y equipo administrativo.
+      </p>
+      <ul class="feature-list">
+        <li><i class="pi pi-shield"></i> Arquitectura en 3 capas (Angular · FastAPI · MySQL)</li>
+        <li><i class="pi pi-id-card"></i> Acceso validado por número de identificación</li>
+        <li><i class="pi pi-check-circle"></i> Control de estado Activado / Desactivado</li>
+      </ul>
+    </div>
+
+    <div class="form-aside">
+      <p-card styleClass="login-card">
+        <div class="card-heading">
+          <h2>Iniciar Sesión</h2>
+          <p>Use su <strong>número de identificación</strong> como usuario</p>
+        </div>
+
+        <div *ngIf="errorMensaje()" class="alert-box">
+          <i class="pi pi-exclamation-triangle"></i>
+          <span>{{ errorMensaje() }}</span>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-stack">
+          <div class="field-group">
+            <label for="identificacion">Usuario (Número de identificación)</label>
+            <span class="p-input-icon-left w-full">
+              <i class="pi pi-id-card"></i>
+              <input
+                id="identificacion"
+                type="text"
+                pInputText
+                formControlName="identificacion"
+                placeholder="Ej. 1001"
+                class="w-full"
+              />
+            </span>
+            <small class="field-error" *ngIf="hasError('identificacion')">
+              Ingrese un número de identificación válido.
+            </small>
+          </div>
+
+          <div class="field-group">
+            <label for="contrasena">Contraseña</label>
+            <p-password
+              inputId="contrasena"
+              formControlName="contrasena"
+              [feedback]="false"
+              [toggleMask]="true"
+              placeholder="Ingrese su contraseña"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+            ></p-password>
+            <small class="field-error" *ngIf="hasError('contrasena')">
+              La contraseña es obligatoria.
+            </small>
+          </div>
+
+          <p-button
+            type="submit"
+            label="Ingresar al Sistema"
+            icon="pi pi-sign-in"
+            [loading]="loading()"
+            styleClass="w-full"
+          ></p-button>
+        </form>
+
+        <div class="register-cta">
+          <span>¿Aún no tienes una cuenta habilitada?</span>
+          <a routerLink="/register" pButton label="Crear nueva cuenta" icon="pi pi-user-plus" class="p-button-outlined p-button-secondary w-full"></a>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>
