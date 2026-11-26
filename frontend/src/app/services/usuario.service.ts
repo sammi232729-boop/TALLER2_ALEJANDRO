@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -8,13 +8,20 @@ import {
   UsuarioPayload,
   UsuarioUpdatePayload
 } from '../models/usuario.model';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsuarioService {
   private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
   private readonly apiUrl = `${environment.apiUrl}/usuarios`;
+
+  private actorHeaders(): HttpHeaders {
+    const actor = this.authService.getCurrentUser();
+    return actor ? new HttpHeaders({ 'X-User-Id': String(actor.id) }) : new HttpHeaders();
+  }
 
   listar(): Observable<Usuario[]> {
     return this.http.get<Usuario[]>(this.apiUrl);
@@ -29,14 +36,22 @@ export class UsuarioService {
   }
 
   actualizar(id: number, payload: UsuarioUpdatePayload): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.apiUrl}/${id}`, payload);
+    return this.http.put<Usuario>(`${this.apiUrl}/${id}`, payload, {
+      headers: this.actorHeaders()
+    });
   }
 
   cambiarEstado(id: number, estado: EstadoUsuario): Observable<Usuario> {
-    return this.http.patch<Usuario>(`${this.apiUrl}/${id}/estado`, { estado });
+    return this.http.patch<Usuario>(
+      `${this.apiUrl}/${id}/estado`,
+      { estado },
+      { headers: this.actorHeaders() }
+    );
   }
 
   eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, {
+      headers: this.actorHeaders()
+    });
   }
 }

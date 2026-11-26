@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, Response, status
+from typing import Optional
+from fastapi import APIRouter, Depends, Header, Response, status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas import EstadoUpdate, UsuarioCreate, UsuarioResponse, UsuarioUpdate
@@ -32,27 +33,33 @@ def crear_usuario(payload: UsuarioCreate, db: Session = Depends(get_db)) -> Usua
 def actualizar_usuario(
     usuario_id: int,
     payload: UsuarioUpdate,
+    x_user_id: Optional[int] = Header(default=None, alias="X-User-Id"),
     db: Session = Depends(get_db),
 ) -> UsuarioResponse:
-    """Actualiza la información completa de un usuario."""
+    """Actualiza la información completa de un usuario (requiere rol Administrativo)."""
     service = UsuarioService(db)
-    return UsuarioResponse.model_validate(service.update_usuario(usuario_id, payload))
+    return UsuarioResponse.model_validate(service.update_usuario(usuario_id, payload, actor_id=x_user_id))
 
 
 @router.patch("/{usuario_id}/estado", response_model=UsuarioResponse)
 def cambiar_estado_usuario(
     usuario_id: int,
     payload: EstadoUpdate,
+    x_user_id: Optional[int] = Header(default=None, alias="X-User-Id"),
     db: Session = Depends(get_db),
 ) -> UsuarioResponse:
-    """Cambia el estado de un usuario entre Activado y Desactivado."""
+    """Cambia el estado de un usuario entre Activado y Desactivado (requiere rol Administrativo)."""
     service = UsuarioService(db)
-    return UsuarioResponse.model_validate(service.update_estado(usuario_id, payload))
+    return UsuarioResponse.model_validate(service.update_estado(usuario_id, payload, actor_id=x_user_id))
 
 
 @router.delete("/{usuario_id}", status_code=status.HTTP_204_NO_CONTENT)
-def eliminar_usuario(usuario_id: int, db: Session = Depends(get_db)) -> Response:
-    """Elimina un usuario existente de la base de datos."""
+def eliminar_usuario(
+    usuario_id: int,
+    x_user_id: Optional[int] = Header(default=None, alias="X-User-Id"),
+    db: Session = Depends(get_db),
+) -> Response:
+    """Elimina un usuario existente de la base de datos (requiere rol Administrativo)."""
     service = UsuarioService(db)
-    service.delete_usuario(usuario_id)
+    service.delete_usuario(usuario_id, actor_id=x_user_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

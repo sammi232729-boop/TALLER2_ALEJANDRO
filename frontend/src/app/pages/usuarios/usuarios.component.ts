@@ -60,6 +60,7 @@ export class UsuariosComponent implements OnInit {
   readonly dialogVisible = signal(false);
   readonly editingUserId = signal<number | null>(null);
   readonly currentUser = signal<Usuario | null>(this.authService.getCurrentUser());
+  readonly isAdmin = computed(() => this.currentUser()?.cargo === 'Administrativo');
 
   readonly totalUsuarios = computed(() => this.usuarios().length);
   readonly totalActivos = computed(
@@ -126,6 +127,14 @@ export class UsuariosComponent implements OnInit {
   }
 
   abrirEditar(usuario: Usuario): void {
+    if (!this.isAdmin()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Permiso denegado',
+        detail: 'Solo los usuarios administrativos pueden editar usuarios.'
+      });
+      return;
+    }
     this.editingUserId.set(usuario.id);
     this.usuarioForm.reset({
       identificacion: usuario.identificacion,
@@ -153,6 +162,17 @@ export class UsuariosComponent implements OnInit {
     this.saving.set(true);
     const raw = this.usuarioForm.getRawValue();
     const editId = this.editingUserId();
+
+    if (editId !== null && !this.isAdmin()) {
+      this.saving.set(false);
+      this.dialogVisible.set(false);
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Permiso denegado',
+        detail: 'Solo los usuarios administrativos pueden editar usuarios.'
+      });
+      return;
+    }
 
     if (editId === null) {
       this.usuarioService.crear(raw).subscribe({
@@ -199,6 +219,14 @@ export class UsuariosComponent implements OnInit {
   }
 
   toggleEstado(usuario: Usuario): void {
+    if (!this.isAdmin()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Permiso denegado',
+        detail: 'Solo los usuarios administrativos pueden activar o desactivar usuarios.'
+      });
+      return;
+    }
     const nuevoEstado: EstadoUsuario =
       usuario.estado === 'Activado' ? 'Desactivado' : 'Activado';
 
@@ -217,7 +245,31 @@ export class UsuariosComponent implements OnInit {
     });
   }
 
+  canDeleteUsuario(usuario: Usuario): boolean {
+    return (
+      this.isAdmin() &&
+      usuario.cargo !== 'Administrativo' &&
+      usuario.id !== this.currentUser()?.id
+    );
+  }
+
   confirmarEliminar(usuario: Usuario): void {
+    if (!this.isAdmin()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Permiso denegado',
+        detail: 'Solo los usuarios administrativos pueden eliminar usuarios.'
+      });
+      return;
+    }
+    if (usuario.cargo === 'Administrativo' || usuario.id === this.currentUser()?.id) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Acción no permitida',
+        detail: 'No se puede eliminar un usuario administrativo ni la cuenta con sesión activa.'
+      });
+      return;
+    }
     this.confirmationService.confirm({
       message: `¿Está seguro de eliminar permanentemente a ${usuario.nombre} ${usuario.apellido} (ID: ${usuario.identificacion})?`,
       header: 'Confirmar eliminación',

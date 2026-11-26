@@ -46,6 +46,21 @@ class UsuarioService:
             )
         return usuario
 
+    def _require_admin(self, actor_id: Optional[int], detail: str) -> Usuario:
+        """Verifica que el usuario autenticado exista, esté activo y tenga cargo Administrativo."""
+        if actor_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=detail,
+            )
+        actor = self.repo.get_by_id(actor_id)
+        if actor is None or actor.estado != "Activado" or actor.cargo != "Administrativo":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=detail,
+            )
+        return actor
+
     def authenticate(self, payload: LoginRequest) -> Usuario:
         """Valida credenciales usando identificación como usuario y verifica estado Activado."""
         usuario = self.repo.get_by_identificacion(payload.identificacion.strip())
@@ -95,8 +110,14 @@ class UsuarioService:
         )
         return self.repo.create(nuevo)
 
-    def update_usuario(self, usuario_id: int, payload: UsuarioUpdate) -> Usuario:
-        """Actualiza los datos de un usuario existente."""
+    def update_usuario(
+        self,
+        usuario_id: int,
+        payload: UsuarioUpdate,
+        actor_id: Optional[int] = None,
+    ) -> Usuario:
+        """Actualiza los datos de un usuario existente (solo Administrativo)."""
+        self._require_admin(actor_id, "Solo los usuarios administrativos pueden editar usuarios.")
         usuario = self._get_or_404(usuario_id)
         identificacion = payload.identificacion.strip()
         email = payload.email.strip().lower()
@@ -117,13 +138,25 @@ class UsuarioService:
 
         return self.repo.update(usuario)
 
-    def update_estado(self, usuario_id: int, payload: EstadoUpdate) -> Usuario:
-        """Cambia el estado del usuario entre Activado y Desactivado."""
+    def update_estado(
+        self,
+        usuario_id: int,
+        payload: EstadoUpdate,
+        actor_id: Optional[int] = None,
+    ) -> Usuario:
+        """Cambia el estado del usuario entre Activado y Desactivado (solo Administrativo)."""
+        self._require_admin(actor_id, "Solo los usuarios administrativos pueden activar o desactivar usuarios.")
         usuario = self._get_or_404(usuario_id)
         usuario.estado = payload.estado
         return self.repo.update(usuario)
 
-    def delete_usuario(self, usuario_id: int) -> None:
-        """Elimina un usuario existente."""
+    def delete_usuario(self, usuario_id: int, actor_id: Optional[int] = None) -> None:
+        """Elimina un usuario no administrativo distinto a la sesión activa (solo Administrativo)."""
+        actor = self._require_admin(actor_id, "Solo los usuarios administrativos pueden eliminar usuarios.")
         usuario = self._get_or_404(usuario_id)
+        if usuario.id == actor.id or usuario.cargo == "Administrativo":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No se puede eliminar un usuario administrativo ni la cuenta con sesión activa.",
+            )
         self.repo.delete(usuario)
